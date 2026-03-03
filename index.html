@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secure Candidate Portal</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Secure Candidate Portal</h1>
+
+  <div id="login">
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="login()">Enter</button>
+    <p id="loginError" style="color:red;"></p>
+  </div>
+
+  <div id="candidates" class="hidden">
+    <h2>Select a Candidate</h2>
+    <button onclick="getCandidate(1)">Candidate 1</button>
+    <button onclick="getCandidate(2)">Candidate 2</button>
+    <button onclick="getCandidate(3)">Candidate 3</button>
+  </div>
+
+  <div id="info" class="hidden">
+    <h2 id="candidateName"></h2>
+    <p id="candidateInfo"></p>
+  </div>
+
+<script>
+
+async function login() {
+  const password = document.getElementById("password").value;
+
+  const response = await fetch("/.netlify/functions/auth", {
+    method: "POST",
+    body: JSON.stringify({ password })
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("candidates").classList.remove("hidden");
+  } else {
+    document.getElementById("loginError").innerText = "Wrong password.";
+  }
+}
+
+async function getCandidate(id) {
+  const response = await fetch("/.netlify/functions/getCandidate", {
+    method: "POST",
+    body: JSON.stringify({ id })
+  });
+
+  const data = await response.json();
+
+  if (data.name) {
+    document.getElementById("info").classList.remove("hidden");
+    document.getElementById("candidateName").innerText = data.name;
+    document.getElementById("candidateInfo").innerText = data.info;
+  }
+}
+
+</script>
+
+</body>
+</html>
